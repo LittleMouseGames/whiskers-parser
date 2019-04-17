@@ -176,6 +176,12 @@ func generate_block(node_key : String) -> Dictionary:
 	if "Dialogue" in node_key:
 		block.text = data[node_key].text.format(format_dictionary)
 	
+	if "Jump" in node_key:
+		for key in data:
+			if "Jump" in key and data[node_key].text == data[key].text and node_key != key:
+				block = generate_block(data[key].connects_to[0])
+				break
+	
 	# For each key of the connected nodes we put it on the block
 	for connected_node_key in data[node_key].connects_to:
 		if "Dialogue" in connected_node_key:
@@ -265,7 +271,7 @@ func generate_block(node_key : String) -> Dictionary:
 				for option in jump_options.options:
 					block.options.append(option)
 			
-		elif "End" in connected_node_key:
+		elif "End" in connected_node_key and not "Jump" in node_key:
 			block.is_final = true
 	
 	current_block = block
