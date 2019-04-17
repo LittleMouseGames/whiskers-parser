@@ -29,6 +29,9 @@ static func open_whiskers(file_path : String) -> Dictionary:
 	
 	return dialogue_data
 
+static func parse_whiskers(data : Dictionary) -> Dictionary:
+	return data
+
 func start_dialogue(dialogue_data : Dictionary, custom_base_instance : Object = null) -> Dictionary:
 	if not dialogue_data.has("Start"):
 		print("[ERROR]: not a valid whiskers data, it has not the key Start.")
@@ -116,7 +119,7 @@ func handle_condition(condition : Dictionary) -> Dictionary:
 			next_block = generate_block(condition.goes_to_key.if_true)
 	else:
 		if not "End" in condition.goes_to_key.if_false:
-			next_block = generate_block(condition.goes_to_key.if_true)
+			next_block = generate_block(condition.goes_to_key.if_false)
 	
 	return next_block
 
@@ -224,6 +227,15 @@ func generate_block(node_key : String) -> Dictionary:
 							}
 					}
 			block.condition = condition
+			
+			var parse_condition = handle_condition(block.condition)
+			
+			if 'Option' in parse_condition.key:
+				var option = {
+					key = parse_condition.key,
+					text = data[parse_condition.key].text,
+				}
+				block.options.append(option)
 		
 		elif "Jump" in connected_node_key:
 			if not block.jump.empty():
