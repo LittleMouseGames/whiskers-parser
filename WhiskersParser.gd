@@ -134,6 +134,8 @@ func handle_jump(jump) -> Dictionary:
 		next_block = handle_jump(jumped_to.jump)
 	elif not jumped_to.condition.empty():
 		next_block = handle_condition(jumped_to.condition)
+	elif not jumped_to.options.empty():
+		next_block = jumped_to
 	
 	return next_block
 
@@ -245,6 +247,11 @@ func generate_block(node_key : String) -> Dictionary:
 					goes_to_key = match_key
 					}
 			block.jump = jump
+			
+			var jump_options = handle_jump(block.jump)
+			if not jump_options.options.empty():
+				for option in jump_options.options:
+					block.options.append(option)
 			
 		elif "End" in connected_node_key:
 			block.is_final = true
