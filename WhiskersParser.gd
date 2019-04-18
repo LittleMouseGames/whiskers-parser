@@ -182,6 +182,22 @@ func generate_block(node_key : String) -> Dictionary:
 				block = generate_block(data[key].connects_to[0])
 				break
 	
+	if "Condition" in node_key: # this isn't very DRY
+		var condition_object = data[node_key]
+		for key in data:
+			if "Expression" in key and data[key].connects_to.front() == node_key:
+				var condition = {
+					key = node_key,
+					logic = data[key].logic,
+					goes_to_key = {
+						if_true = data[node_key].conditions.true,
+						if_false = data[node_key].conditions.false
+					}
+				}
+				block.condition = condition
+				block = process_block(block)
+				break
+	
 	# For each key of the connected nodes we put it on the block
 	for connected_node_key in data[node_key].connects_to:
 		if "Dialogue" in connected_node_key:
